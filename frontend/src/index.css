@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --radius: 0.75rem;
+        /* Café-inspired warm color palette */
+        --background: 0.98 0.01 85;
+        --foreground: 0.25 0.02 45;
+        --card: 1 0 0;
+        --card-foreground: 0.25 0.02 45;
+        --popover: 1 0 0;
+        --popover-foreground: 0.25 0.02 45;
+        /* Warm coffee brown as primary */
+        --primary: 0.45 0.08 45;
+        --primary-foreground: 0.98 0.01 85;
+        /* Cream secondary */
+        --secondary: 0.95 0.02 75;
+        --secondary-foreground: 0.25 0.02 45;
+        --muted: 0.96 0.01 75;
+        --muted-foreground: 0.50 0.02 45;
+        /* Warm accent - caramel */
+        --accent: 0.75 0.12 55;
+        --accent-foreground: 0.98 0.01 85;
+        --destructive: 0.55 0.22 25;
+        --destructive-foreground: 0.98 0.01 85;
+        --border: 0.90 0.01 75;
+        --input: 0.90 0.01 75;
+        --ring: 0.45 0.08 45;
+        --chart-1: 0.65 0.15 35;
+        --chart-2: 0.70 0.12 55;
+        --chart-3: 0.60 0.10 25;
+        --chart-4: 0.80 0.10 65;
+        --chart-5: 0.75 0.08 45;
+        --sidebar: 0.98 0.01 85;
+        --sidebar-foreground: 0.25 0.02 45;
+        --sidebar-primary: 0.45 0.08 45;
+        --sidebar-primary-foreground: 0.98 0.01 85;
+        --sidebar-accent: 0.95 0.02 75;
+        --sidebar-accent-foreground: 0.25 0.02 45;
+        --sidebar-border: 0.90 0.01 75;
+        --sidebar-ring: 0.45 0.08 45;
+        /* Cocoa colors for hashtags */
+        --cocoa: 0.45 0.08 45;
+        --cocoa-light: 0.55 0.10 55;
+        --cocoa-foreground: 0.98 0.01 85;
+    }
+
+    .dark {
+        /* Dark café theme - cozy evening café */
+        --background: 0.18 0.02 45;
+        --foreground: 0.95 0.01 75;
+        --card: 0.22 0.02 45;
+        --card-foreground: 0.95 0.01 75;
+        --popover: 0.20 0.02 45;
+        --popover-foreground: 0.95 0.01 75;
+        /* Light coffee cream as primary in dark mode */
+        --primary: 0.85 0.08 55;
+        --primary-foreground: 0.20 0.02 45;
+        --secondary: 0.28 0.02 45;
+        --secondary-foreground: 0.95 0.01 75;
+        --muted: 0.30 0.02 45;
+        --muted-foreground: 0.70 0.02 55;
+        --accent: 0.65 0.12 45;
+        --accent-foreground: 0.95 0.01 75;
+        --destructive: 0.60 0.20 25;
+        --destructive-foreground: 0.95 0.01 75;
+        --border: 0.35 0.02 45;
+        --input: 0.35 0.02 45;
+        --ring: 0.70 0.08 55;
+        --chart-1: 0.65 0.15 35;
+        --chart-2: 0.70 0.12 55;
+        --chart-3: 0.60 0.10 25;
+        --chart-4: 0.80 0.10 65;
+        --chart-5: 0.75 0.08 45;
+        --sidebar: 0.22 0.02 45;
+        --sidebar-foreground: 0.95 0.01 75;
+        --sidebar-primary: 0.85 0.08 55;
+        --sidebar-primary-foreground: 0.20 0.02 45;
+        --sidebar-accent: 0.28 0.02 45;
+        --sidebar-accent-foreground: 0.95 0.01 75;
+        --sidebar-border: 0.35 0.02 45;
+        --sidebar-ring: 0.70 0.08 55;
+        /* Cocoa colors for hashtags - keep white text in dark mode */
+        --cocoa: 0.45 0.08 45;
+        --cocoa-light: 0.55 0.10 55;
+        --cocoa-foreground: 0.98 0.01 85;
+    }
+
+    * {
+        @apply border-border;
+    }
+    body {
+        @apply bg-background text-foreground;
+    }
+}
+
+

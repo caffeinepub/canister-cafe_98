@@ -1,0 +1,557 @@
+# Canister Cafe   Social Media Platform for Caffeine Applications
+
+## Overview
+Canister Cafe is a social media platform where users can share and discover applications built with Caffeine. The platform features a café-inspired design with Instagram-like grid layouts for showcasing user-created applications and includes a follow system for personalized content discovery.
+
+## Core Features
+
+### Application Initialization & Loading
+- **Robust application initialization sequence ensuring proper backend actor connection before rendering**
+- **Sequential initialization flow: backend actor connection → Internet Identity setup → authentication state → UI rendering**
+- **Error handling for backend actor initialization failures with user-friendly error messages and detailed logging**
+- **Loading states during initial app startup to prevent blank screens with proper loading indicators**
+- **Proper dependency management preventing circular imports and missing references**
+- **Fallback mechanisms for failed backend connections with automatic retry functionality and exponential backoff**
+- **Initial route handling ensuring Welcome screen displays correctly on first load after successful initialization**
+- **Data fetching validation with proper error boundaries and loading indicators**
+- **Actor initialization completion validation before any reactive queries or operations execute**
+- **Comprehensive error logging for Internet Identity and access control initialization failures**
+- **Graceful degradation when backend services are partially unavailable**
+- **Startup health checks ensuring all critical services are ready before app becomes interactive**
+- **Prevention of race conditions between actor initialization and component mounting**
+
+### Welcome Screen
+- Landing page displayed at the root route (`/`) featuring the updated app logo
+- **Large, centered, responsive main hero image using `cccafe.jpeg` as the primary visual element**
+- Tagline: "A showcase for your caffeine powered web applications."
+- Brief description of Canister Café's purpose and features
+- Call-to-action button prompting users to view the feed or create their profile
+- Styled with café aesthetic using warm browns, creams, and soft contrast colors
+- Logo navigation from header returns users to this welcome screen
+- **Hero image maintains responsive design across various screen sizes while staying prominently displayed**
+- **No text title displayed below the main hero image**
+
+### User Authentication & Profiles
+- **Internet Identity authentication integration for secure user login**
+- **Profile system linked to user's Internet Identity Principal**
+- **Automatic profile creation prompt for newly authenticated users without existing profiles**
+- User profile creation with username, bio, and profile picture upload
+- **User profiles support up to 5 external links with custom labels (e.g., Twitter, portfolio site, GitHub, personal website)**
+- **External links stored as array of objects with label and URL fields**
+- **URL validation accepts flexible formats (e.g., twitter.com/username, example.xyz) without requiring protocol prefixes**
+- **ICP NFT Gallery section allowing users to share only ICP-based NFT URLs**
+- **ICP NFT URLs must match known ICP NFT domains or collection patterns for validation**
+- **NFT URLs stored as optional array of validated ICP NFT URLs**
+- Profile editing functionality
+- Individual profile pages displaying user's published apps
+- **Profile pages display external links below bio as clickable buttons opening in new tabs with automatic "https://" prepending for display**
+- **Profile pages display ICP NFT Gallery as responsive grid of uniformly sized clickable image cards**
+- **NFT image cards fetch and render preview images from the NFT URLs**
+- **NFT cards open the full NFT URL in new tabs when clicked**
+- Follow/Unfollow button on user profile pages
+- **Message button on user profile pages next to Follow/Unfollow button that navigates directly to chat with that user**
+- **Clickable Followers and Following counts on profile pages**
+- **Followers/Following modal or subpage displaying full list of users with profile photos, usernames, and action buttons**
+- **Each user in Followers/Following list includes View Profile and Message buttons**
+- **Followers/Following lists styled with café theme and consistent with existing UI design**
+
+### Theme System
+- **Day/Night Mode toggle in the Edit Profile modal allowing users to switch between light (daytime) and dark (night) themes**
+- **Theme preference stored in user profile data and persisted in backend for cross-session consistency**
+- **Real-time theme switching across all UI elements including backgrounds, text colors, and accents**
+- **Theme system leverages existing color scheme defined in CSS with light and dark mode variants**
+- **Toggle placement and styling integrated seamlessly within Edit Profile modal layout with café aesthetic**
+- **Theme preference automatically applied on user login and profile loading**
+- **Default theme set to light mode for new users**
+
+### Admin Role System
+- **Admin role assignment based on user Principal matching predefined admin list**
+- **Admin users identified by `#admin` role for access control to analytics features**
+- **Role-based UI rendering ensuring analytics features are only visible to admin users**
+- **Backend validation ensuring only admin users can access analytics data**
+
+### Follow System
+- Users can follow and unfollow other users
+- Following relationships are tracked by mapping each user's Principal to their following list
+- Users can view their following list and see who follows them
+- Personalized feed based on followed users
+- **Clickable Followers and Following counts displaying user lists with interaction options**
+- **Dynamic follower/following data retrieval from backend queries**
+
+### App Showcase System
+- Users can create posts to showcase their applications
+- **Users can edit their existing app showcase posts**
+- Each showcase post includes:
+  - App name
+  - Description
+  - **Mandatory live app link ending with `.xyz` (flexible format without requiring protocol prefix)**
+  - **Mandatory category selection from predefined list**
+  - **Optional hashtags (array of text tags)**
+  - Optional thumbnail image upload
+- Grid-based layout for displaying showcased apps
+- **Updated placeholder image for app posts without thumbnails displaying "Appuccino Placeholder" text with the existing logo positioned above**
+- **Validation requirements for app showcase creation and editing:**
+  - Live link must be provided and end with `.xyz` (accepts flexible formats like example.xyz)
+  - Category must be selected from allowed categories: `["Business/Productivity", "E-commerce", "Social/Community", "Gaming", "Entertainment", "Finance/Crypto", "Tools/Utility", "Education", "Healthcare", "Sports/Fitness", "Logistics", "Real Estate", "Travel", "Government/Public Services", "Other"]`
+  - **Category validation is case-insensitive and normalizes both user input and allowed categories to lowercase for comparison**
+  - **Hashtags are optional, can be entered as comma or space-separated text, validated to remove duplicates and trim whitespace**
+  - Thumbnail image is optional but can be uploaded for preview
+- **Edit functionality with ownership validation - only post creators can edit their showcases**
+- **Timestamps remain unchanged when editing posts**
+
+### App Update Alert System
+- **App creators can post updates for their existing app showcases**
+- **App update functionality includes:**
+  - **Short update description field for providing context about changes or improvements**
+  - **Ownership validation ensuring only the original creator can update their apps**
+  - **Automatic notification to all followers when an update is posted**
+  - **"New Update" badge displayed on app showcase cards in all feeds**
+  - **Updated apps reinserted into global and following feeds as if freshly posted**
+  - **Preservation of existing likes, comments, and roasts from the original post**
+  - **Update description displayed in app detail view and feed cards for quick context**
+- **Update system integrates with existing notification mechanism**
+- **Updated apps maintain their original creation timestamp but get new update timestamp for feed positioning**
+
+### Social Feed
+- Main feed displaying all app showcases in reverse chronological order
+- **Discover tab combining category browsing and personalized feed functionality**
+- **Browse by Category section at the top of Discover tab with grid or horizontally scrollable list of available app categories**
+- **Category selection displays apps belonging to that category immediately below the selector**
+- **App Feed section below category browsing with two tabs:**
+  - **"All Users" tab showing showcases from all users, sorted by timestamp (newest first)**
+  - **"Following" tab showing showcases only from users that the logged-in user follows, sorted by timestamp (newest first)**
+- Clean, scrollable interface showing app thumbnails and basic details
+- **Category display prominently shown on each app showcase card**
+- **Hashtags displayed as clickable tags under each app showcase card with café theme styling (cocoa accent color with lighter hover tone)**
+- **"New Update" badge displayed on app showcase cards that have recent updates**
+- **Update description shown on app showcase cards for apps with updates**
+- **Seamless tab switching between "All Users" and "Following" feeds with active tab highlighting**
+- **Smooth transitions between category browsing and feed tabs within the same Discover tab**
+
+### Search System
+- **Search tab in top navigation bar accessible to all users**
+- **Search page with search bar and categorized results section**
+- **Multi-category search functionality across:**
+  - **User Profiles - searchable by username, displaying profile cards with username, bio, and Message/Follow buttons**
+  - **Hashtags - searchable hashtags showing app showcases with matching hashtags in grid layout**
+  - **App Showcases - searchable by app name or description, displayed as app showcase cards**
+- **Dynamic search filtering with live results from backend queries**
+- **Unified café-style layout for search results with clickable items**
+- **Navigation from search results to respective profile pages or app detail pages**
+- **Real-time search updates as user types in search bar**
+- **Fixed SearchPage user interaction behavior ensuring username text and Follow button are fully clickable and interactive**
+- **Username clicks navigate to corresponding user profile page without breaking search state**
+- **Follow button clicks execute follow actions properly without reloading or disrupting search functionality**
+
+### Social Interactions
+- Like functionality for showcased apps
+- **Comment system for each app showcase with username display integration**
+- **Comments display the commenter's username (from their profile) instead of Principal ID**
+- **Username lookup functionality for all comment displays across app cards, comment modals, and feed views**
+- **App Roast feature for constructive criticism**
+- View counts and engagement metrics
+
+### Comment System with Username Display
+- **Enhanced comment system displaying commenter usernames from their saved profiles**
+- **Username lookup integration for all comment displays including:**
+  - **App showcase cards showing comments with usernames**
+  - **Comment modals displaying full comment threads with usernames**
+  - **Feed views showing comment previews with usernames**
+  - **App detail pages displaying all comments with usernames**
+- **Fallback handling for comments from users without profiles or deleted profiles**
+- **Preservation of all existing comment functionalities: timestamps, notifications, likes, and threading**
+- **Real-time username updates when users change their profile usernames**
+- **Consistent username display formatting across all comment interfaces**
+
+### App Roast Feature
+- **App Roast option appears alongside Like and Comment buttons on app showcases**
+- **Any user can submit constructive criticism via App Roast modal**
+- **Optional anonymous posting toggle - hides user identity when enabled**
+- **Roasts are only visible to the app creator, not public**
+- **App creators have private "View App Roasts" section to read all feedback for their apps**
+- **Roasts displayed chronologically (newest first) in creator's private view**
+- **Content validation requires non-empty roast text**
+- **Anonymous roasts hide the submitter's Principal and display as "Anonymous User"**
+
+### Direct Messages System
+- **Messages tab in navigation bar accessible to authenticated users with profiles**
+- **Private 1-on-1 chat system between users with reliable message handling**
+- **Users can start direct conversations with any other profile**
+- **New Message button in Messages tab that opens a modal for selecting a user to start a conversation with**
+- **New Message modal includes search bar or input to enter username from existing users and button to start the DM**
+- **Messages list page displaying:**
+  - **All conversations for the logged-in user**
+  - **Each contact's username and profile picture**
+  - **Last message snippet and timestamp**
+  - **Unread message badge counts**
+- **Chat view page/component featuring:**
+  - **Full threaded messages in chronological order**
+  - **Real-time-like auto-refresh with React Query polling**
+  - **Text message sending with timestamps and sender identity**
+- **All communications private to sender and receiver only**
+- **Message notifications integrated into existing notification system**
+- **Message button on profile pages creates new conversation or navigates to existing chat**
+- **Fixed message storage and retrieval ensuring messages are properly linked between sender and receiver**
+- **Corrected conversation ID generation for consistent message threading**
+- **Reliable backend actor method calls from frontend components**
+- **Proper error handling for message sending and loading operations**
+- **Enhanced Principal validation and error handling:**
+  - **Comprehensive Principal validation before any messaging operations**
+  - **Verification that both sender and receiver principals exist in the internal profile registry**
+  - **Rejection of messaging operations with invalid, malformed, or non-existent principals**
+  - **User-friendly error messages for messaging failures instead of technical errors**
+  - **Clear feedback when attempting to message users who don't have profiles**
+  - **Prevention of messaging operations with placeholder or system-generated principals**
+  - **Validation that receiver principal corresponds to an actual registered user profile**
+- **Robust principal handling ensuring no invalid principals are used in messaging operations**
+- **Input validation preventing message sending with missing or invalid receiver principals**
+
+### Notifications System
+- **Comprehensive notification system tracking user events: likes, comments, app roasts, new followers, direct messages, and app updates**
+- **Notifications automatically triggered when:**
+  - **An app receives a like → notify app creator**
+  - **A comment is added → notify app creator**
+  - **An App Roast is submitted → notify app creator**
+  - **A new follow occurs → notify the followed user**
+  - **A direct message is received → notify message recipient**
+  - **An app update is posted → notify all followers of the app creator**
+- **Notifications tab in header navigation accessible to logged-in users**
+- **Notifications page displays chronological list of notifications grouped by type**
+- **Each notification includes clickable links to associated app or user profile**
+- **Visual notification type indicators: like ❤️, comment 💬, roast 🔥, follow 👥, message 💌, update 🔄**
+- **Unread notifications marked visually until viewed**
+- **Café-themed UI styling consistent with existing design**
+
+### Analytics System
+- **Admin-only analytics system for platform monitoring and insights**
+- **Analytics tab in navigation bar visible only to users with `#admin` role**
+- **Analytics dashboard displaying:**
+  - **Summary metrics section at the top with three key metric boxes:**
+    - **Total Profiles - count of all created user profiles**
+    - **Total Page Visits - sum of all recorded visits across all pages**
+    - **Total Apps Shared - count of all app showcases posted on the platform**
+  - **Total number of profile creations with timestamps**
+  - **Page traffic metrics including site views and visits per main page (Discover, Profile, Messages, Search, Notifications)**
+  - **User engagement statistics and platform growth metrics**
+  - **Clean, timestamped charts and counters for data visualization**
+- **Real-time analytics data collection and storage**
+- **Access control ensuring only admin users can view or access analytics data**
+- **Analytics data presented in café-themed UI consistent with existing design**
+- **Summary metrics displayed prominently above existing charts and tables with café-themed styling**
+
+### Demo Content System
+- **Automatic generation of five temporary demo user profiles upon first deployment or reset**
+- **Each demo profile includes unique username, short bio, and default profile picture**
+- **Demo profiles created with valid Internet Identity principals generated through proper backend initialization**
+- **Each demo user creates two sample app showcases with realistic names, descriptions, valid `.xyz` links, random categories from allowed list, example hashtags, and timestamps**
+- **Demo content appears in app feed like normal posts for testing purposes**
+- **Auto-generation runs only once and doesn't overwrite real user profiles**
+- **Demo users have proper principal IDs for messaging system testing and validation**
+
+### User Interface
+- Café-inspired theme and color scheme
+- Instagram-like grid layout for app showcases
+- Responsive design for various screen sizes
+- Clean, modern interface focused on visual content
+- **Welcome screen as landing page with centered updated logo, large responsive hero image using `cccafe.jpeg`, tagline, description, and call-to-action**
+- **Header navigation with updated logo/title linking to welcome screen (unchanged from current implementation)**
+- **Updated logo maintains aspect ratio and fits neatly within existing design structure**
+- **Hero image prominently displayed, centered, and responsive across all device sizes**
+- **No text title displayed below the hero image on the welcome screen**
+- **Smooth transitions between welcome screen, feed, and profile sections**
+- **Category dropdown selection in app creation and edit modals with 15 predefined options**
+- **Optional hashtags input field in app creation and edit modals accepting comma or space-separated tags**
+- **Form validation with clear error messages for invalid `.xyz` links and missing category (relaxed URL format validation)**
+- **User-friendly error handling and toast notifications**
+- **Category information displayed on profile pages and detailed views**
+- **Hashtags displayed as styled clickable tags with café theme styling:**
+  - **Daytime mode: Dark brown or charcoal gray text color for high contrast against light backgrounds**
+  - **Night mode: Existing cocoa accent color with lighter hover tone (unchanged)**
+- **Navigation bar includes Discover tab (combining category browsing and tabbed App Feed), Messages tab, Notifications tab, Search tab, and Analytics tab (admin-only)**
+- **Discover tab UI components:**
+  - **Browse by Category section at the top with grid or horizontally scrollable list of available app categories**
+  - **Category selector displaying apps belonging to selected category immediately below**
+  - **App Feed section below category browsing with two tabs: "All Users" and "Following"**
+  - **"All Users" tab showing global feed from all users**
+  - **"Following" tab showing personalized feed from followed users only**
+  - **Active tab highlighting and seamless tab switching with proper state management**
+  - **Both feed tabs display posts in reverse chronological order with identical showcase card design**
+  - **Smooth transitions between category browsing and feed tabs within same Discover tab**
+  - **Café-themed styling consistent with existing design**
+- **React Query integration for live feed updates and cache invalidation after edits**
+- **Edit button visible only to post creators on app showcase cards**
+- **Edit modal pre-filled with current app data for modification**
+- **Success messages after successful edits with immediate UI updates**
+- **App Update UI components:**
+  - **"Post Update" button visible only to app creators on their showcase cards**
+  - **App update modal with text area for update description**
+  - **"New Update" badge styling on app showcase cards with café theme colors**
+  - **Update description display in app detail view and feed cards**
+  - **Visual indicators for updated apps in feeds and search results**
+- **Profile setup and editing UI includes external links management:**
+  - **Add, edit, and delete up to 5 external links**
+  - **Each link has custom label and URL fields**
+  - **Flexible URL validation accepts formats without protocol prefixes**
+  - **Graceful validation with clear error messages**
+- **Profile pages display external links as labeled, clickable buttons below bio with automatic "https://" prepending for functionality**
+- **ICP NFT Gallery management in profile editing:**
+  - **Add NFT option during profile editing allowing users to input ICP NFT URLs with validation**
+  - **ICP NFT URL validation with error messages for non-ICP NFT domains**
+  - **Remove NFT functionality for existing NFT URLs**
+  - **ICP NFT Gallery displayed as responsive grid of uniformly sized clickable image cards**
+  - **NFT image cards fetch and render preview images from validated ICP NFT URLs**
+  - **Clicking NFT cards opens the full NFT URL in new tabs**
+- **Theme toggle UI components:**
+  - **Day/Night Mode toggle switch in Edit Profile modal positioned seamlessly within existing layout**
+  - **Toggle styled with café aesthetic using warm browns and creams with smooth transition animations**
+  - **Visual indicators showing current theme state (sun icon for light mode, moon icon for dark mode)**
+  - **Real-time theme switching across entire application without page refresh**
+  - **Theme-aware styling for all UI elements including backgrounds, text colors, buttons, and accents**
+  - **Smooth color transitions when switching between light and dark modes**
+  - **Theme preference persistence indication in UI showing saved state**
+- **App Roast modal with text area for feedback and anonymous toggle checkbox**
+- **Private "View App Roasts" section accessible only to app creators showing chronological feedback**
+- **App Roast button styled consistently with Like and Comment buttons**
+- **Internet Identity login integration with profile creation flow for new users**
+- **Automatic profile creation prompt modal for authenticated users without profiles**
+- **Notifications page UI with chronological notification list, type grouping, clickable links, visual type indicators, and unread status marking**
+- **Enhanced comment display UI components:**
+  - **Comment sections showing usernames prominently with commenter's profile username**
+  - **Comment cards displaying username, comment content, and timestamp in consistent formatting**
+  - **Comment modals with full username display and proper username lookup integration**
+  - **Fallback display for comments from users without profiles showing "Unknown User" or similar**
+  - **Real-time username updates when users modify their profile usernames**
+  - **Consistent username styling across all comment interfaces with café theme**
+- **Messages UI components:**
+  - **Messages list page with conversation summaries, contact info, and unread badges**
+  - **New Message button that opens modal for starting new conversations**
+  - **New Message modal with user search/selection functionality and start DM button**
+  - **Chat view with threaded message display and message input**
+  - **Real-time polling for new messages using React Query**
+  - **Café-themed styling consistent with existing design**
+  - **Fixed message sending interface with proper error handling and loading states**
+  - **Reliable conversation initialization and message threading**
+  - **Enhanced Principal validation in messaging UI:**
+    - **Pre-validation of receiver principals before attempting to send messages**
+    - **User-friendly error messages when receiver principal is invalid or not found**
+    - **Clear feedback when attempting to message users without profiles**
+    - **Prevention of messaging operations with malformed or placeholder principals**
+    - **Graceful handling of principal validation failures with informative error messages**
+    - **Input validation ensuring only valid, existing user principals are used for messaging**
+- **Profile page Message button next to Follow/Unfollow button with café theme styling**
+- **Message button navigation to chat view for new or existing conversations**
+- **Search page UI components:**
+  - **Search tab in top navigation bar with search icon**
+  - **Search page with prominent search bar and real-time search functionality**
+  - **Categorized results sections for User Profiles, Hashtags, and App Showcases**
+  - **Profile cards in search results showing username, bio, and Message/Follow buttons**
+  - **Hashtag results displaying app showcases with matching hashtags in grid layout**
+  - **App showcase results displayed as standard app showcase cards**
+  - **Clickable search results navigating to profile pages or app detail pages**
+  - **Café-themed styling consistent with existing design**
+  - **Live search updates with React Query integration**
+  - **Fixed user interaction behavior in SearchPage ensuring username text and Follow button are fully clickable and interactive**
+  - **Username clicks properly navigate to user profile pages without breaking search state**
+  - **Follow button clicks execute follow actions correctly without page reloads or search disruption**
+- **Analytics UI components (admin-only):**
+  - **Analytics tab in navigation bar with analytics icon, visible only to admin users**
+  - **Analytics dashboard with clean, organized layout displaying key metrics**
+  - **Summary metrics section at the top featuring three prominent metric boxes:**
+    - **Total Profiles box displaying count of all created user profiles with café-themed styling**
+    - **Total Page Visits box showing sum of all recorded page visits across the platform with café-themed styling**
+    - **Total Apps Shared box displaying count of all app showcases posted with café-themed styling**
+  - **Summary boxes positioned above existing charts and tables with consistent café theme colors and typography**
+  - **Profile creation statistics with total counts and timestamped charts**
+  - **Page traffic metrics showing visits per main page (Discover, Profile, Messages, Search, Notifications)**
+  - **User engagement counters and platform growth visualization**
+  - **Café-themed styling consistent with existing design**
+  - **Real-time data updates using React Query integration**
+  - **Access control ensuring analytics tab and data are never visible to non-admin users**
+- **Profile page app showcase cards with improved responsive layout:**
+  - **Expanded card width and padding to accommodate all interactive buttons**
+  - **Proper alignment ensuring "Post Update," "Edit," "Roast," and other buttons are fully visible**
+  - **Single-row button layout without clipping or overflow issues**
+  - **Maintained café theme styling and existing functionality**
+  - **Enhanced card responsiveness for various screen sizes**
+- **Timestamp display throughout the application:**
+  - **Original post timestamp displayed on every app showcase card in feeds, user profiles, and discovery listings**
+  - **Most recent update timestamp displayed inside the "Latest Update" box for updated apps**
+  - **Localized, human-readable timestamp formatting (e.g., "Updated on Mar 12, 2025 at 3:42 PM")**
+  - **Consistent timestamp rendering across light and dark modes**
+  - **Timestamps maintain existing layout and functionality without modifications**
+- **Application startup and error handling UI:**
+  - **Loading spinner or skeleton screens during initial app initialization with clear progress indicators**
+  - **Error boundary components catching and displaying initialization failures with detailed error messages**
+  - **Retry buttons for failed backend connections with exponential backoff strategy**
+  - **Graceful degradation when backend services are unavailable with offline mode indicators**
+  - **Clear error messages for common initialization issues including Internet Identity and actor setup failures**
+  - **Startup progress indicators showing initialization stages (backend connection, authentication, data loading)**
+  - **Prevention of UI rendering until all critical initialization steps complete successfully**
+- **Followers/Following UI components:**
+  - **Clickable Followers and Following count displays on profile pages with hover effects**
+  - **Modal or subpage for displaying full user lists with café-themed styling**
+  - **User list items showing profile photo, username, and action buttons (View Profile, Message)**
+  - **Responsive grid or list layout for user display with proper spacing and alignment**
+  - **Loading states and error handling for follower/following data retrieval**
+  - **Close button or navigation for modal/subpage with smooth transitions**
+  - **Consistent styling with existing profile page design and café theme**
+
+## Backend Data Storage
+- **User profiles linked to Internet Identity Principal (username, bio, profile picture, optional external links array, optional ICP NFT gallery array, theme preference)**
+- **Admin role assignments mapping specific Principals to admin privileges**
+- App showcase posts (name, description, thumbnail, mandatory live link ending with `.xyz`, **mandatory category**, **optional hashtags array**, timestamp, **creator Principal for ownership validation**, **optional update description**, **optional update timestamp**)
+- **User interactions (likes, comments with commenter Principal for username lookup)**
+- **Enhanced comment data structure storing commenter Principal for username resolution**
+- **App roasts (content, timestamp, app showcase ID, submitter Principal, anonymous flag)**
+- **Internet Identity authentication state and Principal mapping**
+- **Follow relationships mapping each user's Principal to their following list and followers list**
+- **Demo user profiles and app showcases for testing purposes with valid principals**
+- **Direct messages data structure with enhanced validation and storage:**
+  - **Conversation threads with consistent unique IDs based on sender and receiver principals**
+  - **Individual messages with content, timestamp, sender Principal, and conversation ID**
+  - **Message persistence for chat history with proper linking between participants**
+  - **Fixed conversation ID generation ensuring reliable message threading**
+  - **Enhanced Principal validation ensuring only valid, existing user principals are stored**
+  - **Principal registry validation preventing storage of invalid or non-existent principals**
+  - **Robust principal handling preventing placeholder or system-generated principal usage**
+  - **Validation that all messaging principals correspond to actual registered user profiles**
+- **Notifications data structure for each user storing:**
+  - **Notification ID and timestamp**
+  - **Event type (like, comment, app_roast, follow, message, app_update)**
+  - **Source user Principal (who triggered the notification)**
+  - **Related entity ID (app ID for likes/comments/roasts/updates, user Principal for follows, conversation ID for messages)**
+  - **Read status (unread/read)**
+  - **Target user Principal (notification recipient)**
+- **Analytics data storage:**
+  - **Profile creation metrics with timestamps and total counts**
+  - **Page traffic data including site views and visits per main page**
+  - **User engagement statistics and platform growth metrics**
+  - **Total app showcase count for summary metrics**
+  - **Analytics data accessible only to admin users with proper access control**
+- **Application initialization data ensuring proper backend actor setup and connection validation**
+- **Backend service health status and initialization state tracking**
+
+## Backend Operations
+- **Robust backend actor initialization with proper error handling and connection validation**
+- **Enhanced health check endpoints for frontend to verify backend availability during startup with detailed status reporting**
+- **Graceful handling of backend initialization failures with appropriate error responses and retry mechanisms**
+- **Sequential service initialization ensuring dependencies are met before proceeding to next stage**
+- **Backend readiness validation before accepting any frontend requests**
+- **Comprehensive logging and monitoring of initialization processes for debugging**
+- **Internet Identity authentication and Principal management**
+- **Admin role validation and access control for analytics features**
+- **Profile existence checking for authenticated users**
+- **User profile CRUD operations including external links, ICP NFT gallery persistence and retrieval with ICP NFT URL validation, and theme preference storage**
+- **Theme preference operations:**
+  - **saveThemePreference(theme: Text): Stores user's selected theme (light/dark) in profile data**
+  - **getThemePreference(): Retrieves user's saved theme preference, defaults to light mode for new users**
+  - **Theme preference integrated into existing profile save and retrieval operations**
+- **External links stored as optional array of objects with label and URL fields**
+- **ICP NFT gallery stored as optional array of validated ICP NFT URLs**
+- **ICP NFT URL validation against known ICP NFT domains and collection patterns**
+- **Profile operations maintain backward compatibility with existing profiles without links, NFT galleries, or theme preferences**
+- CRUD operations for app showcases with **mandatory `.xyz` link validation (flexible format) and category validation**
+- **App showcase editing with ownership validation - only creators can edit their posts**
+- **Category validation against predefined list with case-insensitive comparison (both user input and allowed categories normalized to lowercase)**
+- **Hashtags processing and storage (optional array of text tags)**
+- **Rejection of showcase creation and editing when live link is missing, doesn't end with `.xyz`, or category is invalid (relaxed URL format validation)**
+- **Timestamp preservation during edit operations**
+- **App Update operations:**
+  - **postAppUpdate(appId: Text, updateDescription: Text): Updates existing app showcase with new update description and timestamp**
+  - **Ownership validation ensuring only the original app creator can post updates**
+  - **Automatic notification creation for all followers of the app creator when update is posted**
+  - **Update timestamp tracking for feed repositioning while preserving original creation timestamp**
+  - **Integration with existing notification system for app update events**
+- **Social interaction management (likes, comments with enhanced username lookup functionality)**
+- **Enhanced comment operations with username integration:**
+  - **addComment(appId: Text, content: Text): Creates comment with commenter Principal stored for username lookup**
+  - **getCommentsWithUsernames(appId: Text): Returns comments with resolved usernames from commenter profiles**
+  - **Username lookup functionality resolving commenter Principals to their saved profile usernames**
+  - **Fallback handling for comments from users without profiles or deleted profiles**
+  - **Real-time username resolution ensuring current usernames are displayed**
+- **App Roast operations:**
+  - **submitAppRoast(appId: Text, content: Text, anonymous: Bool): Creates roast entry with validation**
+  - **getAppRoasts(appId: Text): Returns roasts for specific app (only accessible to app creator)**
+  - **Content validation ensures non-empty roast text**
+  - **Anonymous flag controls whether submitter Principal is stored/displayed**
+- Feed generation and sorting
+- **Category-based app filtering:**
+  - **getAppsByCategory(category: Text): Returns app showcases filtered by specific category**
+  - **Category filtering with case-insensitive matching against stored app categories**
+- **Following-based feed operations:**
+  - **getFollowingAppShowcases(caller: Principal): Returns app showcases only from users that the caller follows, sorted by timestamp (newest first)**
+  - **Feed filtering based on caller's following list to provide personalized content**
+- Image upload and storage for profiles and optional thumbnails
+- **Follow system operations:**
+  - **followUser(target: Principal): Adds target to caller's following list**
+  - **unfollowUser(target: Principal): Removes target from caller's following list**
+  - **getFollowing(caller): Returns list of users the caller follows**
+  - **getFollowers(user): Returns list of users following the given user**
+  - **getAllAppShowcases(): Returns all app showcases from all users sorted by timestamp (newest first), including hashtags and update information**
+- **Followers/Following list operations:**
+  - **getFollowersList(userPrincipal: Principal): Returns detailed list of users following the specified user with profile information**
+  - **getFollowingList(userPrincipal: Principal): Returns detailed list of users that the specified user follows with profile information**
+  - **User list data includes username, profile picture, and Principal for interaction buttons**
+  - **Efficient data retrieval for displaying follower/following lists in UI components**
+- **editAppShowcase(id: Text, appName: Text, description: Text, thumbnail: ?Storage.ExternalBlob, liveLink: Text, category: Text, hashtags: [Text]): Validates caller ownership, updates post data with relaxed URL validation**
+- **saveCallerUserProfile and getCallerUserProfile operations handle external links, ICP NFT gallery data with ICP NFT URL validation, and theme preference storage**
+- **hasProfile(principal: Principal): Checks if user has created a profile**
+- **Profile creation and management operations linked to Internet Identity Principal**
+- **validateICPNFTUrl(url: Text): Validates that NFT URL matches known ICP NFT domains or collection patterns**
+- **Username lookup operations:**
+  - **getUsernameByPrincipal(principal: Principal): Returns username from user profile for given Principal**
+  - **Batch username lookup for efficient comment display with multiple commenters**
+  - **Caching mechanisms for frequently accessed username lookups**
+  - **Fallback handling for Principals without associated profiles**
+- **Demo content initialization:**
+  - **generateDemoContent(): Creates five demo user profiles with unique usernames, bios, and default profile pictures**
+  - **Demo profiles created with valid Internet Identity principals generated through proper backend initialization**
+  - **Creates two sample app showcases per demo user with realistic names, descriptions, valid `.xyz` links, random categories, example hashtags, and timestamps**
+  - **Runs only once upon first deployment or reset to avoid overwriting real user data**
+  - **Demo content integrates seamlessly with existing feed and profile systems**
+  - **Demo users have proper principal IDs for messaging system testing and validation**
+- **Enhanced Direct Messages operations with comprehensive Principal validation:**
+  - **validatePrincipalForMessaging(principal: Principal): Validates that principal exists in profile registry and is valid for messaging operations**
+  - **sendMessage(receiver: Principal, content: Text): Creates new message with enhanced principal validation ensuring both sender and receiver exist in profile registry**
+  - **Principal registry validation ensuring receiver Principal corresponds to an actual registered user profile**
+  - **Rejection of messaging operations with invalid, malformed, or non-existent principals**
+  - **getUserConversations(): Returns conversation summaries for logged-in user with validated participants only**
+  - **getMessages(conversationId: Text): Returns all messages between validated users in chronological order**
+  - **startConversation(receiver: Principal): Creates or retrieves existing conversation with comprehensive principal validation**
+  - **Enhanced privacy validation ensuring only validated conversation participants can access messages**
+  - **Improved error handling for messaging operations with detailed, user-friendly error messages**
+  - **Principal existence verification against internal profile registry before any messaging operations**
+  - **Prevention of messaging operations with placeholder, system-generated, or invalid principals**
+  - **Clear error responses for messaging failures with specific validation failure reasons**
+- **User search and discovery operations:**
+  - **searchUsersByUsername(query: Text): Returns list of users matching username search query for New Message modal and Search page**
+  - **getAllUsers(): Returns list of all users with profiles for user selection**
+  - **Principal validation ensuring all returned users have valid principals for messaging**
+- **Search operations:**
+  - **searchByHashtag(hashtag: Text): Returns app showcases containing the specified hashtag**
+  - **searchByAppName(query: Text): Returns app showcases matching app name or description search query**
+  - **Case-insensitive search functionality across all search operations**
+  - **Partial matching support for flexible search results**
+- **Notification system operations:**
+  - **createNotification(targetUser: Principal, eventType: Text, sourceUser: Principal, entityId: Text): Creates new notification entry**
+  - **getUserNotifications(user: Principal): Returns chronological list of notifications for user**
+  - **markNotificationAsRead(notificationId: Text, user: Principal): Updates notification read status**
+  - **Automatic notification triggering integrated into existing like, comment, app roast, follow, message, and app update operations**
+  - **Notification cleanup and management for optimal performance**
+- **Analytics operations (admin-only):**
+  - **recordProfileCreation(): Tracks new profile creation with timestamp for analytics**
+  - **recordPageVisit(page: Text): Tracks page visits for traffic analytics (Discover, Profile, Messages, Search, Notifications)**
+  - **getAnalyticsData(): Returns comprehensive analytics data including profile creation metrics, page traffic statistics, and total app showcase count for summary metrics (admin access only)**
+  - **getTotalProfileCount(): Returns total number of profiles created with timestamps**
+  - **getPageTrafficMetrics(): Returns page visit counts and traffic data per main page**
+  - **getTotalAppShowcaseCount(): Returns total count of all app showcases posted on the platform for summary metrics**
+  - **Admin access validation ensuring only users with admin role can access analytics data**
+  - **Real-time analytics data collection and storage for platform monitoring**
+- **Backend initialization and health check operations:**
+  - **initializeBackend(): Ensures all backend services are properly initialized and ready with comprehensive validation**
+  - **getBackendStatus(): Returns detailed backend health status for frontend validation including service readiness indicators**
+  - **validateActorConnection(): Confirms actor system is properly connected and responsive**
+  - **Error handling and logging for initialization failures with detailed error reporting**
+  - **Graceful degradation mechanisms for partial service availability**
+  - **Service dependency validation ensuring all required components are operational before marking backend as ready**
+  - **Initialization timeout handling to prevent indefinite startup delays**
